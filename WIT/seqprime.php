@@ -26,8 +26,8 @@ session_start();
   // Define vars
   var pid, taskTimeline, condition;
   var correct_answer;
-  var mask, redX, check, fixCross, expPrompt;
-  var instr1, instr2, instructStim, countdown, countdownNumbers;
+  var mask, redX, check, fixCross, expPrompt, preTaskScreen;
+  var instr1, instr2, breakTxt, instructStim, breakStim, countdown, countdownNumbers;
   var timeline = [];
   var numTrials = 240;
   // These numbers of stimuli will be drawn from the directory for each set.
@@ -35,6 +35,7 @@ session_start();
   var numTargetToDraw = (numTrials / 2) / 4; // if equal to 0 or less, then all targets in the target directory are used
   var timing_parameters = [400, 200, 200, 500];
   var imageSize = [250, 250];
+  var breakTrials = [25, 75, 150];
   //var primeSize = [imageSize[1] / 1.4, imageSize[1]];
 
   // The timing_parameters should correspond to the planned set of stimuli.
@@ -189,7 +190,7 @@ session_start();
     $myfile = fopen($flName, "r") or die("Unable to open file!");
     echo json_encode(fread($myfile,filesize($flName)));
     fclose($myfile);
-    ?>
+    ?>;
 
   } else {
     instr1 = <?php
@@ -197,7 +198,7 @@ session_start();
     $myfile = fopen($flName, "r") or die("Unable to open file!");
     echo json_encode(fread($myfile,filesize($flName)));
     fclose($myfile);
-    ?>
+    ?>;
   }
 
   if (condition === "SetA") {
@@ -206,16 +207,24 @@ session_start();
     $myfile = fopen($flName, "r") or die("Unable to open file!");
     echo json_encode(fread($myfile,filesize($flName)));
     fclose($myfile);
-    ?>
-
+    ?>;
+    breakTxt = "<div style='width:800px; margin:auto; text-align:center'>\
+    <br>\
+    <h3>Remember: Ignore the face!</h3>\
+    <p style='width:800px'>Press the Spacebar to continue when you are ready.</p>\
+    </div>";
   } else if (condition === "SetB") {
     instr2 = <?php
     $flName = "./Texts/InstructionsScreenSetB.txt";
     $myfile = fopen($flName, "r") or die("Unable to open file!");
     echo json_encode(fread($myfile,filesize($flName)));
     fclose($myfile);
-    ?>
-
+    ?>;
+    breakTxt = "<div style='width:800px; margin:auto; text-align:center'>\
+    <br>\
+    <h3>Remember: Pay attention to the object!</h3>\
+    <p style='width:800px'>Press the Spacebar to continue when you are ready.</p>\
+    </div>";
   }
 
   // Make the expPrompt
@@ -236,10 +245,26 @@ session_start();
   </tr>'
   '</table>';
 
+  // Make the ready screen
+  preTaskScreen = {
+    type: "text",
+    text: '<div style="width:800px; margin:auto">\
+    Please wait for instructions from the experimenter.\
+    </div>',
+    cont_key: [66]
+  }
+
   // Make the instruction stimulus.
   instructStim = {
     type: "text",
     text: '<div style="width:800px; margin:auto">' + instr1 + instr2 + '</div>',
+    cont_key: [32]
+  };
+
+  // Make the "break" stimulus
+  breakStim = {
+    type: "text",
+    text: breakTxt,
     cont_key: [32]
   };
 
@@ -454,12 +479,15 @@ session_start();
     curPrime = prime.prime_type == prime1Label ? 0 : 1;
     curTarget = target.target_type == target1Label ? 0 : 1;
     numTrialTypes[curPrime][curTarget]++;
+
+    // Add in the break trials if it is the right time.
+    if (breakTrials.indexOf(i + 1) != -1) {
+      taskTrials.timeline.push(breakStim);
+    }
   }
 
-  // Randomize trial order here:
-  taskTrials.timeline = shuffle(taskTrials.timeline);
-
   // Push everything to the big timeline in order
+  timeline.push(preTaskScreen);
   timeline.push(instructStim);
   timeline.push(countdown);
   timeline.push(taskTrials);
@@ -469,14 +497,23 @@ session_start();
   // try to set the background-color
   document.body.style.backgroundColor = '#d9d9d9';
 
-  jsPsych.init({
-  	timeline: timeline,
-    fullscreen: false,
-  	on_finish: function() {
-      window.location = "../ctrl.php";
-  		;
-  	}
-  });
+  // Preload stimuli then start the experiment.
+  var allImages = prime1Fls.concat(
+    prime2Fls, target1Fls, target2Fls
+  );
+
+  var startExperiment = function () {
+    jsPsych.init({
+    	timeline: timeline,
+      fullscreen: true,
+    	on_finish: function() {
+        window.location = "../ctrl.php";
+    		;
+    	}
+    });
+  };
+
+  jsPsych.pluginAPI.preloadImages(allImages, startExperiment);
 
 </script>
 </html>
