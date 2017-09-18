@@ -7,6 +7,7 @@ session_start();
 <!doctype html>
 <html>
 <head>
+  <meta http-equiv="content-type" content="text/html" charset="utf-8">
   <title>Experiment</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.4.2/seedrandom.min.js"></script>
@@ -34,7 +35,7 @@ session_start();
   var numPrimeToDraw = 0; // if equal to 0 or less, then all primes in the prime directory are used
   var numTargetToDraw = (numTrials / 2) / 4; // if equal to 0 or less, then all targets in the target directory are used
   var timing_parameters = [400, 200, 200, 500];
-  var imageSize = [250, 250];
+  var imageSize = [250, 250]; var primeImgSize = [179, 250];
   var breakTrials = [25, 75, 150];
   //var primeSize = [imageSize[1] / 1.4, imageSize[1]];
 
@@ -498,9 +499,30 @@ session_start();
   document.body.style.backgroundColor = '#d9d9d9';
 
   // Preload stimuli then start the experiment.
+  /*
   var allImages = prime1Fls.concat(
     prime2Fls, target1Fls, target2Fls
   );
+  */
+  var imgArr = [];
+  var arrArr = [prime1Fls, prime2Fls, target1Fls, target2Fls];
+  var arrSizes = [primeImgSize, primeImgSize, imageSize, imageSize];
+  for (var a = 0; a < arrArr.length; a++) {
+    var curArr = arrArr[a];
+    var curSize = arrSizes[a];
+    for (var i = 0; i < curArr.length; i++) {
+      imgArr.push([
+        curArr[i], curSize
+      ])
+    }
+  }
+  imgArr = imgArr.concat([
+    ['TooSlow', [250,250]],
+    ['XwithSpacebarMsg.png', [188, 250]],
+    ['MaskReal.png', [250, 250]],
+    ['FixationCross380x380', [250, 250]]
+  ]);
+  preloadResizedImages(imgArr);
 
   var startExperiment = function () {
     jsPsych.init({
@@ -512,8 +534,8 @@ session_start();
     	}
     });
   };
-
-  jsPsych.pluginAPI.preloadImages(allImages, startExperiment);
+  startExperiment();
+  //jsPsych.pluginAPI.preloadImages(allImages, startExperiment);
 
 </script>
 </html>
