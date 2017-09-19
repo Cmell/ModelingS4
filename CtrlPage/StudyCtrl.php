@@ -13,5 +13,8 @@ require_once("../Resources/include/membersite_config.php");
   <form action="./GenerateNewCondition.php">
     <input type="submit" value="Generate and Set New Condition" />
   </form>
+  <form action="./ViewCondition.php">
+    <input type="submit" value="View Current Condition" />
+  </form>
 </body>
 </html>
