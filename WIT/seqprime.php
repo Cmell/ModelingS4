@@ -16,7 +16,7 @@ session_start();
   <script src="../Resources/jspsych-5.0.3/plugins/jspsych-sequential-priming.js"></script>
   <script src="../Resources/jspsych-5.0.3/plugins/jspsych-text.js"></script>
   <script src="../Resources/jspsych-5.0.3/plugins/jspsych-call-function.js"></script>
-  <script src="https://rawgit.com/Cmell/JavascriptUtils/master/Util.js"></script>
+  <script src="https://cdn.rawgit.com/Cmell/JavascriptUtilsV9-14-2017/master/Util.js"></script>
   <script src='../Resources/ModS3JSUtil.js'></script>
 	<link href="../Resources/jspsych-5.0.3/css/jspsych.css" rel="stylesheet" type="text/css"></link>
 </head>
@@ -516,13 +516,14 @@ session_start();
       ])
     }
   }
-  imgArr = imgArr.concat([
-    ['TooSlow', [250,250]],
+  imgNamesArr = imgArr.concat([
+    ['TooSlow.png', [250,250]],
     ['XwithSpacebarMsg.png', [188, 250]],
     ['MaskReal.png', [250, 250]],
-    ['FixationCross380x380', [250, 250]]
+    ['FixationCross380x380.png', [250, 250]]
   ]);
-  preloadResizedImages(imgArr);
+  window.allWITImages = new Array();
+  var allWITImages = preloadResizedImages(imgNamesArr);
 
   var startExperiment = function () {
     jsPsych.init({
