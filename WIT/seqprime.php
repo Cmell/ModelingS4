@@ -490,7 +490,8 @@ session_start();
   // Add a "thank you trial"
   var thankyouTrial = {
     type: "text",
-    text: 'Thank you! Please let the experimenter know you are finished.',
+    text: '<p>Thank you! Now, we just have a few questions for you.</p>\
+    <p>Press the <b>spacebar</b> to continue.</p>',
     cont_key: [32]
   };
 
@@ -532,14 +533,18 @@ session_start();
   window.allWITImages = new Array();
   var allWITImages = preloadResizedImages(imgNamesArr);
 
+  var goToSurvey = function () {
+    window.location = 'https://cuboulder.qualtrics.com/jfe/form/SV_5hIxf4tTk2bZhhH?pid=' + pid;
+  };
+
   var startExperiment = function () {
     jsPsych.init({
     	timeline: timeline,
-      fullscreen: true
+      fullscreen: true,
+      on_finish: goToSurvey
     });
   };
   startExperiment();
-  //jsPsych.pluginAPI.preloadImages(allImages, startExperiment);
 
 </script>
 </html>
